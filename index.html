@@ -1,104 +1,151 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Poker Hand Generator</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #004d40;
-    color: white;
-    text-align: center;
-    padding-top: 40px;
-  }
-  button {
-    background: #00bfa5;
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 10px;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  .cards {
-    margin: 20px;
-    font-size: 24px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poker Hand Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background: radial-gradient(circle at center, #004400 0%, #002200 100%);
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin-top: 30px;
+      font-size: 2em;
+      letter-spacing: 1px;
+    }
+
+    button {
+      background-color: #00cc66;
+      border: none;
+      color: white;
+      padding: 12px 25px;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 20px;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background-color: #00ff88;
+      transform: scale(1.05);
+    }
+
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px auto;
+      padding: 20px;
+      max-width: 500px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 255, 100, 0.3);
+    }
+
+    .card {
+      width: 90px;
+      height: 130px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      background-color: white;
+    }
+
+    #result h2 {
+      margin-top: 15px;
+      font-size: clamp(1rem, 4vw, 1.5rem);
+    }
+  </style>
 </head>
 <body>
+  <h1>🎴 Poker Hand Generator 🎴</h1>
+  <button onclick="deal()">Deal</button>
+  <div class="cards" id="cards"></div>
+  <div id="result"></div>
 
-<h1>🎴 Poker Hand Generator 🎴</h1>
-<button onclick="deal()">Deal</button>
-<div class="cards" id="cards"></div>
-<div id="result"></div>
+  <script>
+    const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
+    const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
 
-<script>
-const suits = ["♠", "♥", "♦", "♣"];
-const values = [
-  "2", "3", "4", "5", "6", "7", "8", "9", "10",
-  "J", "Q", "K", "A"
-];
-
-function getDeck() {
-  let deck = [];
-  for (let suit of suits) {
-    for (let value of values) {
-      deck.push({ value, suit });
+    function getDeck() {
+      const deck = [];
+      for (let suit of suits) {
+        for (let value of values) {
+          deck.push({ value, suit });
+        }
+      }
+      return deck;
     }
-  }
-  return deck;
-}
 
-function deal() {
-  let deck = getDeck();
-  let hand = [];
-  for (let i = 0; i < 5; i++) {
-    const index = Math.floor(Math.random() * deck.length);
-    hand.push(deck.splice(index, 1)[0]);
-  }
+    function cardImage(value, suit) {
+      let shortVal = value === "10" ? "0" : value[0].toUpperCase();
+      return `https://deckofcardsapi.com/static/img/${shortVal}${suit[0].toUpperCase()}.png`;
+    }
 
-  document.getElementById("cards").innerHTML =
-    hand.map(c => `${c.value}${c.suit}`).join("  ");
+    function deal() {
+      let deck = getDeck();
+      const hand = [];
+      for (let i = 0; i < 5; i++) {
+        const index = Math.floor(Math.random() * deck.length);
+        hand.push(deck.splice(index, 1)[0]);
+      }
+      displayHand(hand);
+      showResult(hand);
+    }
 
-  const result = evaluateHand(hand);
-  document.getElementById("result").innerHTML = `<h2>${result}</h2>`;
-}
+    function displayHand(hand) {
+      const cardsDiv = document.getElementById("cards");
+      cardsDiv.innerHTML = "";
+      hand.forEach(card => {
+        const img = document.createElement("img");
+        img.src = cardImage(card.value, card.suit);
+        img.className = "card";
+        img.alt = `${card.value} of ${card.suit}`;
+        cardsDiv.appendChild(img);
+      });
+    }
 
-function evaluateHand(hand) {
-  const valueOrder = {
-    "2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,
-    "10":10,"J":11,"Q":12,"K":13,"A":14
-  };
-  
-  let counts = {};
-  let suits = {};
-  for (let card of hand) {
-    counts[card.value] = (counts[card.value] || 0) + 1;
-    suits[card.suit] = (suits[card.suit] || 0) + 1;
-  }
-  
-  let valuesSorted = hand.map(c => valueOrder[c.value]).sort((a,b)=>a-b);
-  let isFlush = Object.keys(suits).length === 1;
-  let isStraight = valuesSorted.every((v,i,arr) =>
-    i===0 || v === arr[i-1] + 1
-  );
+    function showResult(hand) {
+      const resultDiv = document.getElementById("result");
+      const rank = getHandRank(hand);
+      resultDiv.innerHTML = `<h2>${rank}</h2>`;
+    }
 
-  let countsArr = Object.values(counts).sort((a,b)=>b-a);
+    function getHandRank(hand) {
+      const valuesOrder = {
+        "2": 2, "3": 3, "4": 4, "5": 5,
+        "6": 6, "7": 7, "8": 8, "9": 9,
+        "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14
+      };
 
-  if (isStraight && isFlush && valuesSorted[4] === 14) return "🏆 Royal Flush!";
-  if (isStraight && isFlush) return "🌈 Straight Flush!";
-  if (countsArr[0] === 4) return "💥 Four of a Kind!";
-  if (countsArr[0] === 3 && countsArr[1] === 2) return "🎩 Full House!";
-  if (isFlush) return "💧 Flush!";
-  if (isStraight) return "➡️ Straight!";
-  if (countsArr[0] === 3) return "🔱 Three of a Kind!";
-  if (countsArr[0] === 2 && countsArr[1] === 2) return "🎯 Two Pair!";
-  if (countsArr[0] === 2) return "💫 One Pair!";
-  return "🃏 High Card!";
-}
-</script>
+      const valuesArr = hand.map(c => valuesOrder[c.value]).sort((a, b) => a - b);
+      const suitsArr = hand.map(c => c.suit);
 
+      const counts = {};
+      for (let v of valuesArr) counts[v] = (counts[v] || 0) + 1;
+
+      const isFlush = suitsArr.every(s => s === suitsArr[0]);
+      const isStraight = valuesArr.every((v, i) => i === 0 || v === valuesArr[i - 1] + 1);
+      const countsArr = Object.values(counts).sort((a, b) => b - a);
+
+      if (isFlush && JSON.stringify(valuesArr) === JSON.stringify([10,11,12,13,14])) return "Royal Flush 👑";
+      if (isFlush && isStraight) return "Straight Flush 🔥";
+      if (countsArr[0] === 4) return "Four of a Kind 💪";
+      if (countsArr[0] === 3 && countsArr[1] === 2) return "Full House 🏠";
+      if (isFlush) return "Flush 🌊";
+      if (isStraight) return "Straight ⚡";
+      if (countsArr[0] === 3) return "Three of a Kind 🎲";
+      if (countsArr[0] === 2 && countsArr[1] === 2) return "Two Pair ✌️";
+      if (countsArr[0] === 2) return "One Pair 💫";
+      return "High Card 💎";
+    }
+  </script>
 </body>
 </html>
