@@ -1,17 +1,16 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎰 Poker Hand Generator (Animated + Sound)</title>
+<title>Poker Hand Generator</title>
 <style>
   body {
     font-family: Arial, sans-serif;
-    background: radial-gradient(circle at center, #00695c 0%, #003d33 100%);
+    background: #004d40;
     color: white;
     text-align: center;
-    padding-top: 40px;
-    overflow-x: hidden;
+    padding-top: 30px;
   }
   button {
     background: #00bfa5;
@@ -21,44 +20,22 @@
     border-radius: 10px;
     font-size: 18px;
     cursor: pointer;
-    transition: transform 0.1s;
-  }
-  button:active {
-    transform: scale(0.95);
   }
   .cards {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin: 30px 0;
-    perspective: 1000px;
+    gap: 10px;
+    margin: 25px 0;
   }
-  .card {
+  img.card {
     width: 80px;
-    height: 120px;
-    border-radius: 10px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
-    transform-style: preserve-3d;
-    transform: rotateY(180deg);
-    transition: transform 0.6s ease;
-    position: relative;
-  }
-  .card img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    border-radius: 10px;
-  }
-  .card .back {
-    background: linear-gradient(45deg, #004d40, #00796b);
-    border: 2px solid #009688;
-    transform: rotateY(180deg);
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   }
   #result {
     font-size: 1.5em;
     margin-top: 15px;
-    min-height: 1.5em;
   }
 </style>
 </head>
@@ -66,12 +43,9 @@
 
 <h1>🎴 Poker Hand Generator 🎴</h1>
 <button onclick="deal()">Deal</button>
+
 <div class="cards" id="cards"></div>
 <div id="result"></div>
-
-<!-- 🎵 Sound effects -->
-<audio id="shuffleSound" src="https://assets.mixkit.co/sfx/download/mixkit-card-deck-shuffle-2210.wav" preload="auto"></audio>
-<audio id="cardSound" src="https://assets.mixkit.co/sfx/download/mixkit-card-slide-2222.wav" preload="auto"></audio>
 
 <script>
 const suits = ["spades", "hearts", "diamonds", "clubs"];
@@ -80,7 +54,7 @@ const values = [
   "J", "Q", "K", "A"
 ];
 
-// Build deck
+// Deck builder
 function getDeck() {
   let deck = [];
   for (let suit of suits) {
@@ -92,63 +66,31 @@ function getDeck() {
 }
 
 function cardImage(value, suit) {
+  // Using the free deck from deckofcardsapi.com
   return `https://deckofcardsapi.com/static/img/${value[0].toUpperCase()}${suit[0].toUpperCase()}.png`;
 }
 
-async function deal() {
-  const shuffleSound = document.getElementById("shuffleSound");
-  const cardSound = document.getElementById("cardSound");
-  const cardsDiv = document.getElementById("cards");
-  const resultDiv = document.getElementById("result");
-  cardsDiv.innerHTML = "";
-  resultDiv.innerHTML = "";
-
-  shuffleSound.currentTime = 0;
-  shuffleSound.play();
-
+function deal() {
   let deck = getDeck();
   let hand = [];
-
-  // Create 5 card backs
   for (let i = 0; i < 5; i++) {
-    const cardDiv = document.createElement("div");
-    cardDiv.className = "card";
-
-    const front = document.createElement("img");
-    front.className = "front";
-
-    const back = document.createElement("div");
-    back.className = "back";
-
-    cardDiv.appendChild(front);
-    cardDiv.appendChild(back);
-    cardsDiv.appendChild(cardDiv);
-  }
-
-  // Animate deal one by one
-  const cardDivs = document.querySelectorAll(".card");
-  for (let i = 0; i < 5; i++) {
-    await new Promise(r => setTimeout(r, 500));
     const index = Math.floor(Math.random() * deck.length);
-    const card = deck.splice(index, 1)[0];
-    hand.push(card);
-
-    const imgSrc = cardImage(card.value, card.suit);
-    const cardDiv = cardDivs[i];
-    const front = cardDiv.querySelector(".front");
-    front.src = imgSrc;
-
-    // Flip and sound
-    requestAnimationFrame(() => {
-      cardDiv.style.transform = "rotateY(0deg)";
-    });
-    cardSound.currentTime = 0;
-    cardSound.play();
+    hand.push(deck.splice(index, 1)[0]);
   }
 
-  await new Promise(r => setTimeout(r, 1000));
+  // Show images
+  const cardsDiv = document.getElementById("cards");
+  cardsDiv.innerHTML = "";
+  hand.forEach(card => {
+    const img = document.createElement("img");
+    img.src = cardImage(card.value, card.suit);
+    img.className = "card";
+    img.alt = `${card.value} of ${card.suit}`;
+    cardsDiv.appendChild(img);
+  });
+
   const result = evaluateHand(hand);
-  resultDiv.innerHTML = `<h2>${result}</h2>`;
+  document.getElementById("result").innerHTML = `<h2>${result}</h2>`;
 }
 
 function evaluateHand(hand) {
