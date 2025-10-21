@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Poker Hand Generator</title>
+  <title>3-Card Poker Hand Generator</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -13,13 +13,7 @@
       margin: 0;
       padding: 0;
     }
-
-    h1 {
-      margin-top: 30px;
-      font-size: 2em;
-      letter-spacing: 1px;
-    }
-
+    h1 { margin-top: 30px; font-size: 2em; letter-spacing: 1px; }
     button {
       background-color: #00cc66;
       border: none;
@@ -31,15 +25,9 @@
       margin: 20px;
       transition: 0.2s;
     }
-
-    button:hover {
-      background-color: #00ff88;
-      transform: scale(1.05);
-    }
-
+    button:hover { background-color: #00ff88; transform: scale(1.05); }
     .cards {
       display: flex;
-      flex-wrap: wrap;
       justify-content: center;
       gap: 15px;
       margin: 20px auto;
@@ -49,7 +37,6 @@
       border-radius: 15px;
       box-shadow: 0 0 20px rgba(0, 255, 100, 0.3);
     }
-
     .card {
       width: 90px;
       height: 130px;
@@ -57,15 +44,11 @@
       box-shadow: 0 5px 15px rgba(0,0,0,0.5);
       background-color: white;
     }
-
-    #result h2 {
-      margin-top: 15px;
-      font-size: clamp(1rem, 4vw, 1.5rem);
-    }
+    #result h2 { margin-top: 15px; font-size: clamp(1rem, 4vw, 1.5rem); }
   </style>
 </head>
 <body>
-  <h1>🎴 Poker Hand Generator 🎴</h1>
+  <h1>🎴 3-Card Poker Hand Generator 🎴</h1>
   <button onclick="deal()">Deal</button>
   <div class="cards" id="cards"></div>
   <div id="result"></div>
@@ -92,7 +75,7 @@
     function deal() {
       let deck = getDeck();
       const hand = [];
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 3; i++) {
         const index = Math.floor(Math.random() * deck.length);
         hand.push(deck.splice(index, 1)[0]);
       }
@@ -127,23 +110,19 @@
 
       const valuesArr = hand.map(c => valuesOrder[c.value]).sort((a, b) => a - b);
       const suitsArr = hand.map(c => c.suit);
-
       const counts = {};
       for (let v of valuesArr) counts[v] = (counts[v] || 0) + 1;
 
       const isFlush = suitsArr.every(s => s === suitsArr[0]);
-      const isStraight = valuesArr.every((v, i) => i === 0 || v === valuesArr[i - 1] + 1);
+      const isStraight = (valuesArr[2] - valuesArr[0] === 2 && new Set(valuesArr).size === 3) ||
+                         (JSON.stringify(valuesArr) === JSON.stringify([2,3,14])); // A-2-3 straight
       const countsArr = Object.values(counts).sort((a, b) => b - a);
 
-      if (isFlush && JSON.stringify(valuesArr) === JSON.stringify([10,11,12,13,14])) return "Royal Flush 👑";
       if (isFlush && isStraight) return "Straight Flush 🔥";
-      if (countsArr[0] === 4) return "Four of a Kind 💪";
-      if (countsArr[0] === 3 && countsArr[1] === 2) return "Full House 🏠";
-      if (isFlush) return "Flush 🌊";
-      if (isStraight) return "Straight ⚡";
       if (countsArr[0] === 3) return "Three of a Kind 🎲";
-      if (countsArr[0] === 2 && countsArr[1] === 2) return "Two Pair ✌️";
-      if (countsArr[0] === 2) return "One Pair 💫";
+      if (isStraight) return "Straight ⚡";
+      if (isFlush) return "Flush 🌊";
+      if (countsArr[0] === 2) return "Pair 💫";
       return "High Card 💎";
     }
   </script>
