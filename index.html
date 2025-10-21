@@ -176,9 +176,6 @@
       const countsArr = Object.values(counts).sort((a, b) => b - a);
 
       if (isFlush && isStraight) return "Straight Flush 🔥";
-      if (countsArr[0] === 3) return "Three of a Kind 🎲";
-      if (isStraight) return "Straight ⚡";
-      if (isFlush) return "Flush 🌊";
       return "No Winning Hand ❌";
     }
 
