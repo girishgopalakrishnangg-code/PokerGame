@@ -101,7 +101,7 @@
       return `https://deckofcardsapi.com/static/img/${shortVal}${suit[0].toUpperCase()}.png`;
     }
 
-    // Counter logic
+    // Counter logic with color gradient
     let counter = 100;
     const maxCounter = 100;
     const counterBar = document.getElementById("counter-bar");
@@ -115,6 +115,11 @@
       const circumference = 2 * Math.PI * 70;
       const offset = circumference * (1 - counter / maxCounter);
       counterBar.style.strokeDashoffset = offset;
+
+      // Update color from green to red
+      const green = Math.floor((counter / maxCounter) * 255);
+      const red = 255 - green;
+      counterBar.style.stroke = `rgb(${red},${green},0)`;
     }
 
     function deal() {
