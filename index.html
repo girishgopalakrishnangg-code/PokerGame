@@ -52,15 +52,6 @@
     /* Counter styles */
     #counter-container {
       margin: 20px auto;
-      width: 150px;
-      height: 150px;
-      position: relative;
-    }
-    #counter-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
       font-size: 2em;
     }
   </style>
@@ -70,11 +61,6 @@
 
   <!-- Counter Display -->
   <div id="counter-container">
-    <svg width="150" height="150">
-      <circle cx="75" cy="75" r="70" stroke="#00cc66" stroke-width="10" fill="none" opacity="0.3"/>
-      <circle id="counter-bar" cx="75" cy="75" r="70" stroke="#00ff88" stroke-width="10" fill="none"
-              stroke-dasharray="439.82" stroke-dashoffset="0" transform="rotate(-90 75 75)"/>
-    </svg>
     <div id="counter-text">$0</div>
   </div>
 
@@ -101,18 +87,23 @@
       return `https://deckofcardsapi.com/static/img/${shortVal}${suit[0].toUpperCase()}.png`;
     }
 
-// Counter logic with color gradient (incrementing)
-let counter = 0;
-const counterText = document.getElementById("counter-text");
+    // Counter logic
+    let counter = 0;
+    const counterText = document.getElementById("counter-text");
+    let resetNextDeal = false; // reset flag after straight flush
 
-function updateCounter() {
-  counter += 100;              // increase by 100 each deal
-  counterText.textContent = counter;
-}
-
+    function updateCounter() {
+      if (resetNextDeal) {
+        counter = 0;
+        resetNextDeal = false;
+      } else {
+        counter += 100;
+      }
+      counterText.textContent = `$${counter}`;
+    }
 
     function deal() {
-      updateCounter(); // increase counter each deal
+      updateCounter(); // increment counter at start
 
       let deck = getDeck();
       const hand = [];
@@ -140,6 +131,10 @@ function updateCounter() {
       const resultDiv = document.getElementById("result");
       const rank = getHandRank(hand);
       resultDiv.innerHTML = `<h2>${rank}</h2>`;
+
+      if (rank === "Straight Flush 🔥") {
+        resetNextDeal = true;
+      }
     }
 
     function getHandRank(hand) {
