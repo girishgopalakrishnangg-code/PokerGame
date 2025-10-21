@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +24,7 @@
       font-size: 18px;
       border-radius: 10px;
       cursor: pointer;
-      margin: 20px;
+      margin: 10px;
       transition: 0.2s;
     }
     button:hover { background-color: #00ff88; transform: scale(1.05); }
@@ -53,6 +54,11 @@
     #counter-container {
       margin: 20px auto;
       font-size: 2em;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .flash {
+      color: #00ff88;
+      transform: scale(1.3);
     }
   </style>
 </head>
@@ -64,7 +70,11 @@
     <div id="counter-text">$0</div>
   </div>
 
+  <!-- Buttons -->
   <button onclick="deal()">Deal</button>
+  <button onclick="simulateToStraightFlush()">Run to Straight Flush</button>
+
+  <!-- Cards and Result -->
   <div class="cards" id="cards"></div>
   <div id="result"></div>
 
@@ -90,11 +100,17 @@
     // Counter logic
     let counter = 0;
     const counterText = document.getElementById("counter-text");
+    const counterContainer = document.getElementById("counter-container");
     let resetNextDeal = false; // reset flag after straight flush
+
+    function flashCounter() {
+      counterContainer.classList.add("flash");
+      setTimeout(() => counterContainer.classList.remove("flash"), 300);
+    }
 
     function updateCounter() {
       if (resetNextDeal) {
-        counter = 0;
+        counter = 0; // reset only after flashing
         resetNextDeal = false;
       } else {
         counter += 100;
@@ -102,8 +118,10 @@
       counterText.textContent = `$${counter}`;
     }
 
+    // Deal function
     function deal() {
-      updateCounter(); // increment counter at start
+      if (resetNextDeal) flashCounter(); // flash before reset
+      updateCounter();
 
       let deck = getDeck();
       const hand = [];
@@ -132,9 +150,12 @@
       const rank = getHandRank(hand);
       resultDiv.innerHTML = `<h2>${rank}</h2>`;
 
+      // flag reset for next deal only
       if (rank === "Straight Flush 🔥") {
-        resetNextDeal = true;
+        flashCounter();       // flash immediately on hit
+        resetNextDeal = true; // reset after next deal
       }
+      return rank;
     }
 
     function getHandRank(hand) {
@@ -159,6 +180,31 @@
       if (isStraight) return "Straight ⚡";
       if (isFlush) return "Flush 🌊";
       return "No Winning Hand ❌";
+    }
+
+    // Simulation: fast forward to next straight flush and stop before reset
+    function simulateToStraightFlush() {
+      const interval = setInterval(() => {
+        let deck = getDeck();
+        const hand = [];
+        for (let i = 0; i < 3; i++) {
+          const index = Math.floor(Math.random() * deck.length);
+          hand.push(deck.splice(index, 1)[0]);
+        }
+
+        displayHand(hand);
+        const rank = getHandRank(hand);
+        counter += 100;
+        counterText.textContent = `$${counter}`;
+
+        if (rank === "Straight Flush 🔥") {
+          flashCounter(); // flash on hit
+          resetNextDeal = true; // will reset on next deal
+          clearInterval(interval); // stop simulation immediately
+          const resultDiv = document.getElementById("result");
+          resultDiv.innerHTML = `<h2>${rank}</h2>`;
+        }
+      }, 1); // very fast
     }
   </script>
 </body>
