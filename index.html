@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3-Card Poker Hand Generator</title>
+  <title>3-Card Poker Jackpot Simulator</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -61,18 +61,15 @@
   </style>
 </head>
 <body>
-  <h1>🎴 3-Card Poker Hand Generator 🎴</h1>
+  <h1>🎴 3-Card Poker Jackpot Simulator 🎴</h1>
 
-  <!-- Counter Display -->
   <div id="counter-container">
-    <div id="counter-text">$0</div>
+    <div id="counter-text">$50000</div>
   </div>
 
-  <!-- Buttons -->
   <button onclick="deal()">Deal</button>
   <button onclick="simulateToStraightFlush()">Run to Straight Flush</button>
 
-  <!-- Cards and Result -->
   <div class="cards" id="cards"></div>
   <div id="result"></div>
 
@@ -95,11 +92,11 @@
       return `https://deckofcardsapi.com/static/img/${shortVal}${suit[0].toUpperCase()}.png`;
     }
 
-    // Counter logic
     let counter = 0;
+    const baseJackpot = 50000;
     const counterText = document.getElementById("counter-text");
     const counterContainer = document.getElementById("counter-container");
-    let resetNextDeal = false; // reset flag after straight flush
+    let resetNextDeal = false;
 
     function flashCounter() {
       counterContainer.classList.add("flash");
@@ -108,13 +105,15 @@
 
     function updateCounter(increment = 1) {
       if (resetNextDeal) {
-        counter = 0; // reset after flashing
+        counter = 0;
         resetNextDeal = false;
       } else {
         counter += increment;
       }
-      // display actual counter as a $ amount
-      counterText.textContent = `$${counter}`;
+
+      // avoid dividing by zero
+      const displayValue = counter === 0 ? baseJackpot : (baseJackpot / counter);
+      counterText.textContent = `$${displayValue.toFixed(2)}`;
     }
 
     function deal() {
@@ -150,7 +149,7 @@
 
       if (rank === "Straight Flush 🔥") {
         flashCounter();
-        resetNextDeal = true; // reset next deal
+        resetNextDeal = true;
       }
       return rank;
     }
@@ -187,13 +186,12 @@
 
         displayHand(hand);
         const rank = getHandRank(hand);
-
-        updateCounter(1); // increment by 1 each simulation run
+        updateCounter(1);
 
         if (rank === "Straight Flush 🔥") {
           flashCounter();
-          resetNextDeal = true; // reset next deal
-          clearInterval(interval); // stop simulation immediately
+          resetNextDeal = true;
+          clearInterval(interval);
           const resultDiv = document.getElementById("result");
           resultDiv.innerHTML = `<h2>${rank}</h2>`;
         }
