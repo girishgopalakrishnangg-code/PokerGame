@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,7 +66,7 @@
 
   <!-- Counter Display -->
   <div id="counter-container">
-    <div id="counter-text">$0</div>
+    <div id="counter-text">$50000 / $0</div>
   </div>
 
   <!-- Buttons -->
@@ -108,14 +107,14 @@
       setTimeout(() => counterContainer.classList.remove("flash"), 300);
     }
 
-    function updateCounter() {
+    function updateCounter(increment = 1) {
       if (resetNextDeal) {
         counter = 0; // reset only after flashing
         resetNextDeal = false;
       } else {
-        counter += 10;
+        counter += increment;
       }
-      counterText.textContent = `$${counter}`;
+      counterText.textContent = `$50000 / $${counter}`;
     }
 
     // Deal function
@@ -150,7 +149,6 @@
       const rank = getHandRank(hand);
       resultDiv.innerHTML = `<h2>${rank}</h2>`;
 
-      // flag reset for next deal only
       if (rank === "Straight Flush 🔥") {
         flashCounter();       // flash immediately on hit
         resetNextDeal = true; // reset after next deal
@@ -172,7 +170,7 @@
 
       const isFlush = suitsArr.every(s => s === suitsArr[0]);
       const isStraight = (valuesArr[2] - valuesArr[0] === 2 && new Set(valuesArr).size === 3) ||
-                         (JSON.stringify(valuesArr) === JSON.stringify([2,3,14])); // A-2-3 straight
+                         (JSON.stringify(valuesArr) === JSON.stringify([2,3,14]));
       const countsArr = Object.values(counts).sort((a, b) => b - a);
 
       if (isFlush && isStraight) return "Straight Flush 🔥";
@@ -191,8 +189,7 @@
 
         displayHand(hand);
         const rank = getHandRank(hand);
-        counter += 100;
-        counterText.textContent = `$${counter}`;
+        updateCounter(100); // increment by 100 for simulation
 
         if (rank === "Straight Flush 🔥") {
           flashCounter(); // flash on hit
