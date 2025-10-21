@@ -49,7 +49,6 @@
 
     #result h2 { margin-top: 15px; font-size: clamp(1rem, 4vw, 1.5rem); }
 
-    /* Counter styles */
     #counter-container {
       margin: 20px auto;
       font-size: 2em;
@@ -66,7 +65,7 @@
 
   <!-- Counter Display -->
   <div id="counter-container">
-    <div id="counter-text">$50000 / $0</div>
+    <div id="counter-text">$0</div>
   </div>
 
   <!-- Buttons -->
@@ -109,17 +108,17 @@
 
     function updateCounter(increment = 1) {
       if (resetNextDeal) {
-        counter = 0; // reset only after flashing
+        counter = 0; // reset after flashing
         resetNextDeal = false;
       } else {
         counter += increment;
       }
-      counterText.textContent = `$50000 / $${counter}`;
+      // display actual counter as a $ amount
+      counterText.textContent = `$${counter}`;
     }
 
-    // Deal function
     function deal() {
-      if (resetNextDeal) flashCounter(); // flash before reset
+      if (resetNextDeal) flashCounter();
       updateCounter();
 
       let deck = getDeck();
@@ -150,8 +149,8 @@
       resultDiv.innerHTML = `<h2>${rank}</h2>`;
 
       if (rank === "Straight Flush 🔥") {
-        flashCounter();       // flash immediately on hit
-        resetNextDeal = true; // reset after next deal
+        flashCounter();
+        resetNextDeal = true; // reset next deal
       }
       return rank;
     }
@@ -177,7 +176,6 @@
       return "No Winning Hand ❌";
     }
 
-    // Simulation: fast forward to next straight flush and stop before reset
     function simulateToStraightFlush() {
       const interval = setInterval(() => {
         let deck = getDeck();
@@ -189,16 +187,17 @@
 
         displayHand(hand);
         const rank = getHandRank(hand);
-        updateCounter(100); // increment by 100 for simulation
+
+        updateCounter(1); // increment by 1 each simulation run
 
         if (rank === "Straight Flush 🔥") {
-          flashCounter(); // flash on hit
-          resetNextDeal = true; // will reset on next deal
+          flashCounter();
+          resetNextDeal = true; // reset next deal
           clearInterval(interval); // stop simulation immediately
           const resultDiv = document.getElementById("result");
           resultDiv.innerHTML = `<h2>${rank}</h2>`;
         }
-      }, 1); // very fast
+      }, 1);
     }
   </script>
 </body>
