@@ -176,27 +176,36 @@
     }
 
     function simulateToStraightFlush() {
-      const interval = setInterval(() => {
-        let deck = getDeck();
-        const hand = [];
-        for (let i = 0; i < 3; i++) {
-          const index = Math.floor(Math.random() * deck.length);
-          hand.push(deck.splice(index, 1)[0]);
-        }
+  let localCounter = 0; // count silently
 
-        displayHand(hand);
-        const rank = getHandRank(hand);
-        updateCounter(1);
-
-        if (rank === "Straight Flush 🔥") {
-          flashCounter();
-          resetNextDeal = true;
-          clearInterval(interval);
-          const resultDiv = document.getElementById("result");
-          resultDiv.innerHTML = `<h2>${rank}</h2>`;
-        }
-      }, 1);
+  const interval = setInterval(() => {
+    let deck = getDeck();
+    const hand = [];
+    for (let i = 0; i < 3; i++) {
+      const index = Math.floor(Math.random() * deck.length);
+      hand.push(deck.splice(index, 1)[0]);
     }
+
+    const rank = getHandRank(hand);
+    localCounter++;
+
+    if (rank === "Straight Flush 🔥") {
+      clearInterval(interval);
+
+      // update display ONCE at the end
+      counter = localCounter;
+      const displayValue = baseJackpot / counter;
+      counterText.textContent = `$${displayValue.toFixed(2)}`;
+      flashCounter();
+
+      displayHand(hand);
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = `<h2>${rank}</h2>`;
+
+      resetNextDeal = true;
+    }
+  }, 1);
+}
   </script>
 </body>
 </html>
