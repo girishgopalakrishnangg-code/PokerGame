@@ -67,7 +67,7 @@
     <div id="counter-text">$50000</div>
   </div>
 
-  <button onclick="deal()">Deal</button>
+  <button onclick="resetCash()">Reset Cash</button>
   <button onclick="simulateToStraightFlush()">Run to Straight Flush</button>
 
   <div class="cards" id="cards"></div>
@@ -111,23 +111,15 @@
         counter += increment;
       }
 
-      // avoid dividing by zero
       const displayValue = counter === 0 ? baseJackpot : (baseJackpot / counter);
       counterText.textContent = `$${displayValue.toFixed(2)}`;
     }
 
-    function deal() {
-      if (resetNextDeal) flashCounter();
-      updateCounter();
-
-      let deck = getDeck();
-      const hand = [];
-      for (let i = 0; i < 3; i++) {
-        const index = Math.floor(Math.random() * deck.length);
-        hand.push(deck.splice(index, 1)[0]);
-      }
-      displayHand(hand);
-      showResult(hand);
+    function resetCash() {
+      counter = 0;
+      resetNextDeal = false;
+      counterText.textContent = `$${baseJackpot.toFixed(2)}`;
+      flashCounter();
     }
 
     function displayHand(hand) {
@@ -140,18 +132,6 @@
         img.alt = `${card.value} of ${card.suit}`;
         cardsDiv.appendChild(img);
       });
-    }
-
-    function showResult(hand) {
-      const resultDiv = document.getElementById("result");
-      const rank = getHandRank(hand);
-      resultDiv.innerHTML = `<h2>${rank}</h2>`;
-
-      if (rank === "Straight Flush 🔥") {
-        flashCounter();
-        resetNextDeal = true;
-      }
-      return rank;
     }
 
     function getHandRank(hand) {
@@ -169,43 +149,42 @@
       const isFlush = suitsArr.every(s => s === suitsArr[0]);
       const isStraight = (valuesArr[2] - valuesArr[0] === 2 && new Set(valuesArr).size === 3) ||
                          (JSON.stringify(valuesArr) === JSON.stringify([2,3,14]));
-      const countsArr = Object.values(counts).sort((a, b) => b - a);
 
       if (isFlush && isStraight) return "Straight Flush 🔥";
       return "No Winning Hand ❌";
     }
 
     function simulateToStraightFlush() {
-  let localCounter = 0; // count silently
+      let localCounter = 0; // count silently
 
-  const interval = setInterval(() => {
-    let deck = getDeck();
-    const hand = [];
-    for (let i = 0; i < 3; i++) {
-      const index = Math.floor(Math.random() * deck.length);
-      hand.push(deck.splice(index, 1)[0]);
+      const interval = setInterval(() => {
+        let deck = getDeck();
+        const hand = [];
+        for (let i = 0; i < 3; i++) {
+          const index = Math.floor(Math.random() * deck.length);
+          hand.push(deck.splice(index, 1)[0]);
+        }
+
+        const rank = getHandRank(hand);
+        localCounter++;
+
+        if (rank === "Straight Flush 🔥") {
+          clearInterval(interval);
+
+          // update display ONCE at the end
+          counter = localCounter;
+          const displayValue = baseJackpot / counter;
+          counterText.textContent = `$${displayValue.toFixed(2)}`;
+          flashCounter();
+
+          displayHand(hand);
+          const resultDiv = document.getElementById("result");
+          resultDiv.innerHTML = `<h2>${rank}</h2>`;
+
+          resetNextDeal = true;
+        }
+      }, 1);
     }
-
-    const rank = getHandRank(hand);
-    localCounter++;
-
-    if (rank === "Straight Flush 🔥") {
-      clearInterval(interval);
-
-      // update display ONCE at the end
-      counter = localCounter;
-      const displayValue = baseJackpot / counter;
-      counterText.textContent = `$${displayValue.toFixed(2)}`;
-      flashCounter();
-
-      displayHand(hand);
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = `<h2>${rank}</h2>`;
-
-      resetNextDeal = true;
-    }
-  }, 1);
-}
   </script>
 </body>
 </html>
