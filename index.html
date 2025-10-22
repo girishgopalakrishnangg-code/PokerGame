@@ -116,11 +116,12 @@
     }
 
     function resetCash() {
-      counter = 0;
-      resetNextDeal = false;
-      counterText.textContent = `$${baseJackpot.toFixed(2)}`;
-      flashCounter();
-    }
+  counter = 0;              // restart counter
+  resetNextDeal = false;    // clear any flags
+  // keep internal baseJackpot = 50000 unchanged
+  counterText.textContent = "💰💰💰";  // hide visible amount
+  flashCounter();
+}
 
     function displayHand(hand) {
       const cardsDiv = document.getElementById("cards");
