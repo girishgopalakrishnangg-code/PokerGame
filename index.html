@@ -93,15 +93,8 @@
           flashResult();
           totalWon += 100;
         } else {
-          const secondChance = Math.floor(Math.random() * 3) + 1; // 1 in 3 chance for $15
-          if (secondChance === 1) {
-            resultDiv.textContent = "$15 (Second Chance)";
-            flashResult();
-            totalWon += 15;
-          } else {
-            resultDiv.textContent = "You lost!";
-            resultDiv.classList.add("loss");
-          }
+          resultDiv.textContent = "You lost!";
+          resultDiv.classList.add("loss");
         }
 
         // Update totals
