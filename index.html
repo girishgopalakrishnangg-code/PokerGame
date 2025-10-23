@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -75,7 +75,7 @@
   <script>
     const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
     const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
-    const baseJackpot = 459;
+    const baseJackpot = 345;
     let counter = 0;
 
     const jackpotDisplay = document.getElementById("jackpot-display");
@@ -149,7 +149,7 @@
         if (rank === "Straight Flush 🔥") {
           clearInterval(interval);
 
-          const displayValue = baseJackpot - counter;
+          const displayValue = baseJackpot / counter;
           jackpotDisplay.textContent = `$${displayValue.toFixed(2)}`;
           flashCounter();
 
