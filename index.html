@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Jackpot with Counters</title>
+  <title>Jackpot with Multiple Rounds</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -28,6 +28,12 @@
     }
     button:hover { background-color: #00ff88; transform: scale(1.05); }
 
+    #current-round {
+      font-size: 1.5em;
+      margin-top: 20px;
+      color: #ffff88;
+    }
+
     #result {
       margin: 20px auto;
       font-size: 2em;
@@ -46,10 +52,11 @@
   </style>
 </head>
 <body>
-  <h1>🎰 Simple Jackpot 🎰</h1>
+  <h1>🎰 Multi-Round Jackpot 🎰</h1>
 
-  <button onclick="runSimulation(100)">Run 100 Spins</button>
+  <button onclick="runSimulation()">Run 100 Spins</button>
 
+  <div id="current-round">Current Round: —</div>
   <div id="result">💰💰💰</div>
 
   <div id="counters">
@@ -65,6 +72,7 @@
     const totalWonEl = document.getElementById("total-won");
     const totalLostEl = document.getElementById("total-lost");
     const netProfitEl = document.getElementById("net-profit");
+    const currentRoundEl = document.getElementById("current-round");
 
     const ticketPrice = 1;
     let totalSpins = 0;
@@ -72,44 +80,66 @@
     let totalLost = 0;
     let isRunning = false;
 
+    const rounds = [
+      { payout: 20, chance: 21 },
+      { payout: 50, chance: 51 },
+      { payout: 100, chance: 101 },
+      { payout: 500, chance: 501 },
+      { payout: 1000, chance: 1001 },
+      { payout: 20, chance: 21 },
+      { payout: 50, chance: 51 },
+      { payout: 100, chance: 101 },
+      { payout: 500, chance: 501 },
+      { payout: 1000, chance: 1001 }
+    ];
+
     function flashResult() {
       resultDiv.classList.add("flash");
       setTimeout(() => resultDiv.classList.remove("flash"), 300);
     }
 
-    function singleSpin() {
+    function singleSpin(round) {
       totalSpins++;
       spinCountEl.textContent = totalSpins;
       totalLost += ticketPrice;
 
-      const chance = Math.floor(Math.random() * 21) + 1; // 1 in 21 chance
-      if (chance === 1) {
-        resultDiv.textContent = "$20!";
+      // Show current round
+      currentRoundEl.textContent = `Current Round: $${round.payout} Jackpot (1 in ${round.chance})`;
+
+      // Random roll for this round
+      const chanceRoll = Math.floor(Math.random() * round.chance) + 1;
+      if (chanceRoll === 1) {
+        resultDiv.textContent = `$${round.payout}!`;
         flashResult();
-        totalWon += 20;
+        totalWon += round.payout;
         resultDiv.classList.remove("loss");
       } else {
         resultDiv.textContent = "You lost!";
         resultDiv.classList.add("loss");
       }
 
-      totalWonEl.textContent = totalWon;
-      totalLostEl.textContent = totalLost;
+      totalWonEl.textContent = totalWon.toFixed(2);
+      totalLostEl.textContent = totalLost.toFixed(2);
 
       const netProfit = totalWon - totalLost;
-      netProfitEl.textContent = `$${netProfit}`;
+      netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
       netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
     }
 
-    async function runSimulation(times) {
+    async function runSimulation() {
       if (isRunning) return;
       isRunning = true;
 
-      for (let i = 0; i < times; i++) {
-        singleSpin();
-        await new Promise(r => setTimeout(r, 100)); // adjust delay here (100ms)
+      // 10 rounds of 10 spins
+      for (let roundIndex = 0; roundIndex < rounds.length; roundIndex++) {
+        const round = rounds[roundIndex];
+        for (let spin = 0; spin < 10; spin++) {
+          singleSpin(round);
+          await new Promise(r => setTimeout(r, 100)); // delay between spins
+        }
       }
 
+      currentRoundEl.textContent = "All Rounds Completed!";
       isRunning = false;
     }
   </script>
