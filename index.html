@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jackpot Simulation</title>
+  <title>Simple Jackpot</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -28,7 +28,7 @@
     }
     button:hover { background-color: #00ff88; transform: scale(1.05); }
 
-    #counter-container {
+    #result {
       margin: 20px auto;
       font-size: 2em;
       transition: color 0.2s, transform 0.2s;
@@ -40,36 +40,34 @@
   </style>
 </head>
 <body>
-  <h1>💰 Jackpot Simulation 💰</h1>
+  <h1>🎰 Simple Jackpot 🎰</h1>
 
-  <div id="counter-container">
-    <div id="jackpot-display">💰💰💰</div>
-  </div>
+  <button onclick="runJackpot()">Run Simulation</button>
 
-  <button onclick="simulateJackpot()">Run Simulation</button>
+  <div id="result">💰💰💰</div>
 
   <script>
-    const baseJackpot = 345;
-    const jackpotDisplay = document.getElementById("jackpot-display");
-    const counterContainer = document.getElementById("counter-container");
+    const resultDiv = document.getElementById("result");
 
-    function flashCounter() {
-      counterContainer.classList.add("flash");
-      setTimeout(() => counterContainer.classList.remove("flash"), 300);
+    function flashResult() {
+      resultDiv.classList.add("flash");
+      setTimeout(() => resultDiv.classList.remove("flash"), 300);
     }
 
-    function simulateJackpot() {
-      let draws = 0;
-      let number = 0;
-
-      while (number !== 1) {
-        number = Math.floor(Math.random() * 460) + 1;
-        draws++;
+    function runJackpot() {
+      const chance = Math.floor(Math.random() * 11) + 1; // 1 in 11 chance
+      if (chance === 1) {
+        resultDiv.textContent = "$100!";
+        flashResult();
+      } else {
+        const secondChance = Math.floor(Math.random() * 3) + 1; // 1 in 3 chance
+        if (secondChance === 1) {
+          resultDiv.textContent = "Second Chance!";
+          flashResult();
+        } else {
+          resultDiv.textContent = "💰💰💰";
+        }
       }
-
-      const displayValue = baseJackpot / draws;
-      jackpotDisplay.textContent = `$${displayValue.toFixed(2)}`;
-      flashCounter();
     }
   </script>
 </body>
