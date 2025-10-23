@@ -82,7 +82,7 @@
       spinCountEl.textContent = totalSpins;
       totalLost += ticketPrice;
 
-      const chance = Math.floor(Math.random() * 10) + 1; // 1 in 10 chance
+      const chance = Math.floor(Math.random() * 11) + 1; // 1 in 11 chance
       if (chance === 1) {
         resultDiv.textContent = "$100!";
         flashResult();
