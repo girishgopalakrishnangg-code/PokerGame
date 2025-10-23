@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Jackpot</title>
+  <title>Simple Jackpot with Counters</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -33,12 +33,15 @@
       font-size: 2em;
       transition: color 0.2s, transform 0.2s;
     }
-    .flash {
-      color: #00ff88;
-      transform: scale(1.3);
+    .flash { color: #00ff88; transform: scale(1.3); }
+    .loss { color: #ff5555; }
+    #counters {
+      margin-top: 20px;
+      font-size: 1.2em;
     }
-    .loss {
-      color: #ff5555;
+    #net-profit {
+      font-weight: bold;
+      font-size: 1.4em;
     }
   </style>
 </head>
@@ -49,8 +52,24 @@
 
   <div id="result">💰💰💰</div>
 
+  <div id="counters">
+    <p>Total Spins: <span id="spin-count">0</span></p>
+    <p>Total Won: $<span id="total-won">0</span></p>
+    <p>Total Lost: $<span id="total-lost">0</span></p>
+    <p>Net Profit/Loss: <span id="net-profit">$0</span></p>
+  </div>
+
   <script>
     const resultDiv = document.getElementById("result");
+    const spinCountEl = document.getElementById("spin-count");
+    const totalWonEl = document.getElementById("total-won");
+    const totalLostEl = document.getElementById("total-lost");
+    const netProfitEl = document.getElementById("net-profit");
+
+    const ticketPrice = 15;
+    let totalSpins = 0;
+    let totalWon = 0;
+    let totalLost = 0;
 
     function flashResult() {
       resultDiv.classList.add("flash");
@@ -58,27 +77,43 @@
     }
 
     function runJackpot() {
-      // Indicate that a spin has started
+      // Increment spin count
+      totalSpins++;
+      spinCountEl.textContent = totalSpins;
+
+      // Show spinning message
       resultDiv.textContent = "Spinning...";
       resultDiv.classList.remove("loss");
 
-      // Short delay to simulate spin
       setTimeout(() => {
-        const chance = Math.floor(Math.random() * 11) + 1; // 1 in 11 chance
+        const chance = Math.floor(Math.random() * 11) + 1; // 1 in 11 chance for $100
         if (chance === 1) {
           resultDiv.textContent = "$100!";
           flashResult();
+          totalWon += 100;
         } else {
-          const secondChance = Math.floor(Math.random() * 3) + 1; // 1 in 3 chance
+          const secondChance = Math.floor(Math.random() * 3) + 1; // 1 in 3 chance for $15
           if (secondChance === 1) {
-            resultDiv.textContent = "Second Chance!";
+            resultDiv.textContent = "$15 (Second Chance)";
             flashResult();
+            totalWon += 15;
           } else {
             resultDiv.textContent = "You lost!";
             resultDiv.classList.add("loss");
+            totalLost += ticketPrice;
           }
         }
-      }, 500); // half-second spin animation
+
+        // Update totals
+        totalWonEl.textContent = totalWon;
+        totalLostEl.textContent = totalLost;
+
+        // Calculate net profit/loss
+        const netProfit = totalWon - totalLost;
+        netProfitEl.textContent = `$${netProfit}`;
+        netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
+
+      }, 500); // spin delay
     }
   </script>
 </body>
