@@ -1,9 +1,9 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3-Card Poker Jackpot</title>
+  <title>Jackpot Simulation</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -28,27 +28,6 @@
     }
     button:hover { background-color: #00ff88; transform: scale(1.05); }
 
-    .cards {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin: 20px auto;
-      padding: 20px;
-      max-width: 500px;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0, 255, 100, 0.3);
-    }
-    .card {
-      width: 90px;
-      height: 130px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-      background-color: white;
-    }
-
-    #result h2 { margin-top: 15px; font-size: clamp(1rem, 4vw, 1.5rem); }
-
     #counter-container {
       margin: 20px auto;
       font-size: 2em;
@@ -61,23 +40,16 @@
   </style>
 </head>
 <body>
-  <h1>🎴 3-Card Poker Jackpot 🎴</h1>
+  <h1>💰 Jackpot Simulation 💰</h1>
 
   <div id="counter-container">
     <div id="jackpot-display">💰💰💰</div>
   </div>
 
-  <button onclick="simulateToStraightFlush()">Run to Straight Flush</button>
-
-  <div class="cards" id="cards"></div>
-  <div id="result"></div>
+  <button onclick="simulateJackpot()">Run Simulation</button>
 
   <script>
-    const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
-    const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
     const baseJackpot = 345;
-    let counter = 0;
-
     const jackpotDisplay = document.getElementById("jackpot-display");
     const counterContainer = document.getElementById("counter-container");
 
@@ -86,78 +58,18 @@
       setTimeout(() => counterContainer.classList.remove("flash"), 300);
     }
 
-    function getDeck() {
-      const deck = [];
-      for (let suit of suits) {
-        for (let value of values) {
-          deck.push({ value, suit });
-        }
+    function simulateJackpot() {
+      let draws = 0;
+      let number = 0;
+
+      while (number !== 1) {
+        number = Math.floor(Math.random() * 460) + 1;
+        draws++;
       }
-      return deck;
-    }
 
-    function cardImage(value, suit) {
-      let shortVal = value === "10" ? "0" : value[0].toUpperCase();
-      return `https://deckofcardsapi.com/static/img/${shortVal}${suit[0].toUpperCase()}.png`;
-    }
-
-    function displayHand(hand) {
-      const cardsDiv = document.getElementById("cards");
-      cardsDiv.innerHTML = "";
-      hand.forEach(card => {
-        const img = document.createElement("img");
-        img.src = cardImage(card.value, card.suit);
-        img.className = "card";
-        img.alt = `${card.value} of ${card.suit}`;
-        cardsDiv.appendChild(img);
-      });
-    }
-
-    function getHandRank(hand) {
-      const valuesOrder = {
-        "2": 2, "3": 3, "4": 4, "5": 5,
-        "6": 6, "7": 7, "8": 8, "9": 9,
-        "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14
-      };
-
-      const valuesArr = hand.map(c => valuesOrder[c.value]).sort((a, b) => a - b);
-      const suitsArr = hand.map(c => c.suit);
-      const isFlush = suitsArr.every(s => s === suitsArr[0]);
-      const isStraight = (valuesArr[2] - valuesArr[0] === 2 && new Set(valuesArr).size === 3) ||
-                         (JSON.stringify(valuesArr) === JSON.stringify([2,3,14]));
-
-      if (isFlush && isStraight) return "Straight Flush 🔥";
-      return "No Winning Hand ❌";
-    }
-
-    function simulateToStraightFlush() {
-      counter = 0; // start clean each run
-      jackpotDisplay.textContent = "💰💰💰"; // hide during simulation
-      document.getElementById("result").innerHTML = "";
-
-      const interval = setInterval(() => {
-        counter++;
-        const deck = getDeck();
-        const hand = [];
-        for (let i = 0; i < 3; i++) {
-          const index = Math.floor(Math.random() * deck.length);
-          hand.push(deck.splice(index, 1)[0]);
-        }
-
-        const rank = getHandRank(hand);
-
-        if (rank === "Straight Flush 🔥") {
-          clearInterval(interval);
-
-          const displayValue = baseJackpot / counter;
-          jackpotDisplay.textContent = `$${displayValue.toFixed(2)}`;
-          flashCounter();
-
-          displayHand(hand);
-          const resultDiv = document.getElementById("result");
-          resultDiv.innerHTML = `<h2>${rank}</h2>`;
-        }
-      }, 1);
+      const displayValue = baseJackpot / draws;
+      jackpotDisplay.textContent = `$${displayValue.toFixed(2)}`;
+      flashCounter();
     }
   </script>
 </body>
