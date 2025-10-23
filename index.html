@@ -66,7 +66,7 @@
     const totalLostEl = document.getElementById("total-lost");
     const netProfitEl = document.getElementById("net-profit");
 
-    const ticketPrice = 10;
+    const ticketPrice = 1;
     let totalSpins = 0;
     let totalWon = 0;
     let totalLost = 0;
@@ -84,9 +84,9 @@
 
       const chance = Math.floor(Math.random() * 11) + 1; // 1 in 11 chance
       if (chance === 1) {
-        resultDiv.textContent = "$100!";
+        resultDiv.textContent = "$10!";
         flashResult();
-        totalWon += 100;
+        totalWon += 10;
         resultDiv.classList.remove("loss");
       } else {
         resultDiv.textContent = "You lost!";
