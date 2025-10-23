@@ -77,9 +77,10 @@
     }
 
     function runJackpot() {
-      // Increment spin count
+      // Increment spin count and always count ticket cost
       totalSpins++;
       spinCountEl.textContent = totalSpins;
+      totalLost += ticketPrice;
 
       // Show spinning message
       resultDiv.textContent = "Spinning...";
@@ -100,7 +101,6 @@
           } else {
             resultDiv.textContent = "You lost!";
             resultDiv.classList.add("loss");
-            totalLost += ticketPrice;
           }
         }
 
