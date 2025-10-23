@@ -37,6 +37,9 @@
       color: #00ff88;
       transform: scale(1.3);
     }
+    .loss {
+      color: #ff5555;
+    }
   </style>
 </head>
 <body>
@@ -55,19 +58,27 @@
     }
 
     function runJackpot() {
-      const chance = Math.floor(Math.random() * 11) + 1; // 1 in 11 chance
-      if (chance === 1) {
-        resultDiv.textContent = "$100!";
-        flashResult();
-      } else {
-        const secondChance = Math.floor(Math.random() * 3) + 1; // 1 in 3 chance
-        if (secondChance === 1) {
-          resultDiv.textContent = "Second Chance!";
+      // Indicate that a spin has started
+      resultDiv.textContent = "Spinning...";
+      resultDiv.classList.remove("loss");
+
+      // Short delay to simulate spin
+      setTimeout(() => {
+        const chance = Math.floor(Math.random() * 11) + 1; // 1 in 11 chance
+        if (chance === 1) {
+          resultDiv.textContent = "$100!";
           flashResult();
         } else {
-          resultDiv.textContent = "💰💰💰";
+          const secondChance = Math.floor(Math.random() * 3) + 1; // 1 in 3 chance
+          if (secondChance === 1) {
+            resultDiv.textContent = "Second Chance!";
+            flashResult();
+          } else {
+            resultDiv.textContent = "You lost!";
+            resultDiv.classList.add("loss");
+          }
         }
-      }
+      }, 500); // half-second spin animation
     }
   </script>
 </body>
