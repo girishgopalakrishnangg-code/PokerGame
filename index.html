@@ -48,7 +48,7 @@
 <body>
   <h1>🎰 Simple Jackpot 🎰</h1>
 
-  <button onclick="runJackpot()">Run Simulation</button>
+  <button onclick="runSimulation(100)">Run 100 Spins</button>
 
   <div id="result">💰💰💰</div>
 
@@ -70,43 +70,47 @@
     let totalSpins = 0;
     let totalWon = 0;
     let totalLost = 0;
+    let isRunning = false;
 
     function flashResult() {
       resultDiv.classList.add("flash");
       setTimeout(() => resultDiv.classList.remove("flash"), 300);
     }
 
-    function runJackpot() {
-      // Increment spin count and always count ticket cost
+    function singleSpin() {
       totalSpins++;
       spinCountEl.textContent = totalSpins;
       totalLost += ticketPrice;
 
-      // Show spinning message
-      resultDiv.textContent = "Spinning...";
-      resultDiv.classList.remove("loss");
+      const chance = Math.floor(Math.random() * 10) + 1; // 1 in 10 chance
+      if (chance === 1) {
+        resultDiv.textContent = "$100!";
+        flashResult();
+        totalWon += 100;
+        resultDiv.classList.remove("loss");
+      } else {
+        resultDiv.textContent = "You lost!";
+        resultDiv.classList.add("loss");
+      }
 
-      setTimeout(() => {
-        const chance = Math.floor(Math.random() * 10) + 1; // 1 in 10 chance for $100
-        if (chance === 1) {
-          resultDiv.textContent = "$100!";
-          flashResult();
-          totalWon += 100;
-        } else {
-          resultDiv.textContent = "You lost!";
-          resultDiv.classList.add("loss");
-        }
+      totalWonEl.textContent = totalWon;
+      totalLostEl.textContent = totalLost;
 
-        // Update totals
-        totalWonEl.textContent = totalWon;
-        totalLostEl.textContent = totalLost;
+      const netProfit = totalWon - totalLost;
+      netProfitEl.textContent = `$${netProfit}`;
+      netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
+    }
 
-        // Calculate net profit/loss
-        const netProfit = totalWon - totalLost;
-        netProfitEl.textContent = `$${netProfit}`;
-        netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
+    async function runSimulation(times) {
+      if (isRunning) return;
+      isRunning = true;
 
-      }, 500); // spin delay
+      for (let i = 0; i < times; i++) {
+        singleSpin();
+        await new Promise(r => setTimeout(r, 100)); // adjust delay here (100ms)
+      }
+
+      isRunning = false;
     }
   </script>
 </body>
