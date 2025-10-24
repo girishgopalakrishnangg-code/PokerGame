@@ -80,19 +80,6 @@
     let totalLost = 0;
     let isRunning = false;
 
-    // Simple weighted payouts
-    const payouts = [20, 0];
-    const weights = [1, 20]; // 1 in 21 chance to win $20
-
-    function weightedChoice(values, weights) {
-      const totalWeight = weights.reduce((a, b) => a + b, 0);
-      let r = Math.random() * totalWeight;
-      for (let i = 0; i < values.length; i++) {
-        if (r < weights[i]) return values[i];
-        r -= weights[i];
-      }
-    }
-
     function flashResult() {
       resultDiv.classList.add("flash");
       setTimeout(() => resultDiv.classList.remove("flash"), 800);
@@ -103,9 +90,10 @@
       spinCountEl.textContent = totalSpins;
       totalLost += ticketPrice;
 
-      // Weighted random payout
-      const payout = weightedChoice(payouts, weights);
-      currentRoundEl.textContent = `Spin ${totalSpins}: Chance 1 in 21 for $20`;
+      // 9 out of 40 chance to win $3
+      const winChance = 9 / 40;
+      const payout = Math.random() < winChance ? 3 : 0;
+      currentRoundEl.textContent = `Spin ${totalSpins}: 9 in 40 chance to win $3`;
 
       if (payout > 0) {
         resultDiv.textContent = `$${payout}!`;
