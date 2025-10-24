@@ -54,7 +54,7 @@
 <body>
   <h1>🎰 Randomized Jackpot 🎰</h1>
 
-  <button onclick="runSimulation()">Run 30 Spins</button>
+  <button onclick="runSimulation()">Run 5 Spins</button>
 
   <div id="current-round">Current Jackpot: —</div>
   <div id="result">💰💰💰</div>
@@ -117,7 +117,7 @@
       if (isRunning) return;
       isRunning = true;
 
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 5; i++) {
         singleSpin();
         await new Promise(r => setTimeout(r, 800));
       }
