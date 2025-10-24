@@ -54,7 +54,7 @@
 <body>
   <h1>🎰 Randomized Jackpot 🎰</h1>
 
-  <button onclick="runSimulation()">Run 100 Spins</button>
+  <button onclick="runSimulation()">Run 10 Spins</button>
 
   <div id="current-round">Current Jackpot: —</div>
   <div id="result">💰💰💰</div>
@@ -95,7 +95,7 @@
 
     function flashResult() {
       resultDiv.classList.add("flash");
-      setTimeout(() => resultDiv.classList.remove("flash"), 300);
+      setTimeout(() => resultDiv.classList.remove("flash"), 500);
     }
 
     function singleSpin() {
@@ -129,7 +129,7 @@
       if (isRunning) return;
       isRunning = true;
 
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 10; i++) {
         singleSpin();
         await new Promise(r => setTimeout(r, 100));
       }
