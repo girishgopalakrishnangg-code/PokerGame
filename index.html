@@ -90,10 +90,19 @@
       spinCountEl.textContent = totalSpins;
       totalLost += ticketPrice;
 
-      // 99 out of 400 chance to win $4
-      const winChance = 99 / 400;
-      const payout = Math.random() < winChance ? 4 : 0;
-      currentRoundEl.textContent = `Spin ${totalSpins}: 99 in 400 chance to win $4`;
+      // Payouts:
+      // $13 → 1 in 20
+      // $3  → 2 in 20
+      const rand = Math.random();
+      let payout = 0;
+
+      if (rand < 1 / 20) {
+        payout = 13;
+      } else if (rand < 3 / 20) {
+        payout = 3;
+      }
+
+      currentRoundEl.textContent = `Spin ${totalSpins}: `;
 
       if (payout > 0) {
         resultDiv.textContent = `$${payout}!`;
