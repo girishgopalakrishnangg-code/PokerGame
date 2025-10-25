@@ -2,123 +2,151 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Randomized Jackpot (Reinforcement Timing)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Randomized Jackpot Game</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      background: radial-gradient(circle at center, #003300 0%, #001a00 100%);
+      background: radial-gradient(circle at center, #004400 0%, #002200 100%);
       color: white;
       margin: 0;
-      padding: 40px;
+      padding: 0;
     }
-    h1 { font-size: 1.8em; margin-bottom: 10px; }
+    h1 { margin-top: 30px; font-size: 2em; letter-spacing: 1px; }
+
     button {
       background-color: #00cc66;
       border: none;
       color: white;
-      padding: 12px 20px;
-      font-size: 16px;
+      padding: 12px 25px;
+      font-size: 18px;
       border-radius: 10px;
       cursor: pointer;
-      margin: 6px;
-      transition: 0.15s;
+      margin: 10px;
+      transition: 0.2s;
     }
-    button:hover { background-color: #00ff88; transform: scale(1.03); }
-    #result {
-      margin: 30px auto;
-      font-size: 2.4em;
-      transition: transform 0.25s, color 0.25s;
-    }
-    .flash { transform: scale(1.4); color: #00ff88; }
-    .loss { color: #ff6666; }
-    #info {
-      font-size: 1.2em;
+    button:hover { background-color: #00ff88; transform: scale(1.05); }
+
+    #current-round {
+      font-size: 1.5em;
       margin-top: 20px;
       color: #ffff88;
+    }
+
+    #result {
+      margin: 20px auto;
+      font-size: 2em;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .flash { color: #00ff88; transform: scale(1.3); }
+    .loss { color: #ff5555; }
+    #counters {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+    #net-profit {
+      font-weight: bold;
+      font-size: 1.4em;
     }
   </style>
 </head>
 <body>
-  <h1>🎰 Randomized Jackpot — Variable Spin Delay</h1>
+  <h1>🎰 Randomized Jackpot 🎰</h1>
 
-  <button id="auto-run">Start Auto Spins</button>
-  <button id="stop-run" disabled>Stop</button>
+  <button onclick="runSimulation()">Run 30 Spins</button>
 
-  <div id="info">Press start to run automatic spins.</div>
-  <div id="result">💰</div>
+  <div id="current-round">Current Jackpot: —</div>
+  <div id="result">💰💰💰</div>
+
+  <div id="counters">
+    <p>Total Spins: <span id="spin-count">0</span></p>
+    <p>Total Won: $<span id="total-won">0</span></p>
+    <p>Total Lost: $<span id="total-lost">0</span></p>
+    <p>Net Profit/Loss: <span id="net-profit">$0</span></p>
+  </div>
 
   <script>
     const resultDiv = document.getElementById("result");
-    const infoDiv = document.getElementById("info");
-    const startBtn = document.getElementById("auto-run");
-    const stopBtn = document.getElementById("stop-run");
+    const spinCountEl = document.getElementById("spin-count");
+    const totalWonEl = document.getElementById("total-won");
+    const totalLostEl = document.getElementById("total-lost");
+    const netProfitEl = document.getElementById("net-profit");
+    const currentRoundEl = document.getElementById("current-round");
 
+    const ticketPrice = 1;
     let totalSpins = 0;
-    let running = false;
-    let cancel = false;
-
-    const payoutTable = [
-      { threshold: 1 / 20, value: 13 }, // big win 5%
-      { threshold: 3 / 20, value: 3 }   // small win 10%
-    ];
+    let totalWon = 0;
+    let totalLost = 0;
+    let isRunning = false;
 
     function flashResult(duration = 600) {
       resultDiv.classList.add("flash");
       setTimeout(() => resultDiv.classList.remove("flash"), duration);
     }
 
-    function singleSpin() {
+    function singleSpin(flashDuration = 600) {
       totalSpins++;
+      spinCountEl.textContent = totalSpins;
+      totalLost += ticketPrice;
+
       const rand = Math.random();
       let payout = 0;
 
-      if (rand < payoutTable[0].threshold) payout = payoutTable[0].value;
-      else if (rand < payoutTable[1].threshold) payout = payoutTable[1].value;
+      // Payouts:
+      // $13 → 1 in 20
+      // $3  → 2 in 20
+      if (rand < 1 / 20) {
+        payout = 13;
+      } else if (rand < 3 / 20) {
+        payout = 3;
+      }
 
-      infoDiv.textContent = `Spin ${totalSpins}`;
+      currentRoundEl.textContent = `Spin ${totalSpins}:`;
 
       if (payout > 0) {
         resultDiv.textContent = `$${payout}!`;
+        flashResult(flashDuration);
+        totalWon += payout;
         resultDiv.classList.remove("loss");
-        flashResult();
       } else {
         resultDiv.textContent = "Try Again!";
         resultDiv.classList.add("loss");
       }
-      return payout;
+
+      totalWonEl.textContent = totalWon.toFixed(2);
+      totalLostEl.textContent = totalLost.toFixed(2);
+
+      const netProfit = totalWon - totalLost;
+      netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
+      netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
+
+      return payout; // return payout value for delay adjustment
     }
 
-    async function autoRun(spins = 40) {
-      running = true;
-      cancel = false;
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
+    async function runSimulation() {
+      if (isRunning) return;
+      isRunning = true;
 
-      for (let i = 0; i < spins; i++) {
-        if (cancel) break;
-
+      for (let i = 0; i < 30; i++) {
         const payout = singleSpin();
 
-        // Variable delay 500–700 ms
+        // Base delay: random 500–700 ms
         let spinDelay = 500 + Math.random() * 200;
-        // Add reinforcement pause for wins
+
+        // Add extra pause for wins
         if (payout === 13) spinDelay += 600;
         else if (payout === 3) spinDelay += 400;
 
+        // Sync flash timing to delay
         flashResult(spinDelay);
+
         await new Promise(r => setTimeout(r, spinDelay));
       }
 
-      running = false;
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-      infoDiv.textContent = cancel ? "Stopped early." : "Session complete.";
+      currentRoundEl.textContent = "All Spins Completed!";
+      isRunning = false;
     }
-
-    startBtn.addEventListener("click", () => autoRun(40));
-    stopBtn.addEventListener("click", () => { cancel = true; });
   </script>
 </body>
 </html>
