@@ -13,7 +13,12 @@
       margin: 0;
       padding: 0;
     }
-    h1 { margin-top: 30px; font-size: 2em; letter-spacing: 1px; }
+
+    h1 { 
+      margin-top: 30px; 
+      font-size: 2em; 
+      letter-spacing: 1px; 
+    }
 
     button {
       background-color: #00cc66;
@@ -26,8 +31,16 @@
       margin: 10px;
       transition: 0.2s;
     }
-    button:hover:not(:disabled) { background-color: #00ff88; transform: scale(1.05); }
-    button:disabled { background-color: #00994d; cursor: not-allowed; }
+
+    button:hover:not(:disabled) { 
+      background-color: #00ff88; 
+      transform: scale(1.05); 
+    }
+
+    button:disabled { 
+      background-color: #00994d; 
+      cursor: not-allowed; 
+    }
 
     #current-round {
       font-size: 1.5em;
@@ -38,15 +51,33 @@
     #result {
       margin: 20px auto;
       font-size: 2em;
-      transition: color 0.2s, transform 0.2s;
+      transition: color 0.3s, transform 0.3s;
     }
-    .flash { color: #00ff88; transform: scale(1.3); }
-    .loss { color: #ff5555; }
+
+    .flash { 
+      transform: scale(1.3);
+    }
+
+    .loss { 
+      color: #ff5555; 
+    }
+
+    .win {
+      color: #00ff66;
+      animation: pulseGlow 1s infinite;
+    }
+
+    @keyframes pulseGlow {
+      0% { text-shadow: 0 0 8px #00ff66, 0 0 16px #00cc66; transform: scale(1); }
+      50% { text-shadow: 0 0 16px #00ff99, 0 0 32px #00ff66; transform: scale(1.1); }
+      100% { text-shadow: 0 0 8px #00ff66, 0 0 16px #00cc66; transform: scale(1); }
+    }
 
     #counters {
       margin-top: 20px;
       font-size: 1.2em;
     }
+
     #net-profit {
       font-weight: bold;
       font-size: 1.4em;
@@ -99,7 +130,7 @@
         currentRoundEl.textContent = `Spin ${totalSpins}:`;
         resultDiv.textContent = "Spinning...";
         resultDiv.style.color = "#ffff88";
-        resultDiv.classList.remove("loss");
+        resultDiv.classList.remove("loss", "win");
 
         // ✨ Variable flash duration
         const flashDuration = 500 + Math.random() * 800;
@@ -121,12 +152,14 @@
 
         if (payout > 0) {
           resultDiv.textContent = `$${payout}!`;
+          resultDiv.classList.add("win");
           flashResult(700 + Math.random() * 500);
-          resultDiv.classList.remove("loss");
           totalWon += payout;
 
-          // 🕒 Show wins longer (1.8–2.4 s)
+          // 🕒 Hold win longer (1.8–2.4 s)
           await new Promise(r => setTimeout(r, 1800 + Math.random() * 600));
+
+          resultDiv.classList.remove("win"); // stop glowing before next spin
         } else {
           resultDiv.textContent = "Try Again!";
           resultDiv.classList.add("loss");
