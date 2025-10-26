@@ -26,7 +26,8 @@
       margin: 10px;
       transition: 0.2s;
     }
-    button:hover { background-color: #00ff88; transform: scale(1.05); }
+    button:hover:not(:disabled) { background-color: #00ff88; transform: scale(1.05); }
+    button:disabled { background-color: #00994d; cursor: not-allowed; }
 
     #current-round {
       font-size: 1.5em;
@@ -41,6 +42,7 @@
     }
     .flash { color: #00ff88; transform: scale(1.3); }
     .loss { color: #ff5555; }
+
     #counters {
       margin-top: 20px;
       font-size: 1.2em;
@@ -54,9 +56,9 @@
 <body>
   <h1>🎰 Randomized Jackpot 🎰</h1>
 
-  <button onclick="runSimulation()">Run 30 Spins</button>
+  <button id="spin-button" onclick="singleSpin()">Spin Once</button>
 
-  <div id="current-round">Current Jackpot: —</div>
+  <div id="current-round">Ready to spin!</div>
   <div id="result">💰💰💰</div>
 
   <div id="counters">
@@ -73,26 +75,41 @@
     const totalLostEl = document.getElementById("total-lost");
     const netProfitEl = document.getElementById("net-profit");
     const currentRoundEl = document.getElementById("current-round");
+    const spinButton = document.getElementById("spin-button");
 
     const ticketPrice = 1;
     let totalSpins = 0;
     let totalWon = 0;
     let totalLost = 0;
-    let isRunning = false;
+    let isSpinning = false;
 
     function flashResult(duration = 600) {
       resultDiv.classList.add("flash");
       setTimeout(() => resultDiv.classList.remove("flash"), duration);
     }
 
-    function singleSpin(flashDuration = 600) {
+    async function singleSpin() {
+      if (isSpinning) return; // prevent double click
+      isSpinning = true;
+      spinButton.disabled = true;
+
       totalSpins++;
       spinCountEl.textContent = totalSpins;
+      currentRoundEl.textContent = `Spin ${totalSpins}:`;
+      resultDiv.textContent = "Spinning...";
+      resultDiv.style.color = "#ffff88";
+      resultDiv.classList.remove("loss");
+
+      // Flash animation during spin
+      flashResult(1000);
+
+      // Wait for suspense
+      await new Promise(r => setTimeout(r, 1000));
 
       const rand = Math.random();
       let payout = 0;
 
-      // Adjusted payouts:
+      // Payouts:
       // $12 → 1 in 20
       // $2  → 2 in 20
       if (rand < 1 / 20) {
@@ -101,17 +118,15 @@
         payout = 2;
       }
 
-      currentRoundEl.textContent = `Spin ${totalSpins}:`;
-
       if (payout > 0) {
         resultDiv.textContent = `$${payout}!`;
-        flashResult(flashDuration);
+        flashResult(600);
         resultDiv.classList.remove("loss");
         totalWon += payout;
       } else {
         resultDiv.textContent = "Try Again!";
         resultDiv.classList.add("loss");
-        totalLost += ticketPrice; // only deduct ticket on loss
+        totalLost += ticketPrice; // only deduct on loss
       }
 
       totalWonEl.textContent = totalWon.toFixed(2);
@@ -121,29 +136,8 @@
       netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
       netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
 
-      return payout;
-    }
-
-    async function runSimulation() {
-      if (isRunning) return;
-      isRunning = true;
-
-      for (let i = 0; i < 30; i++) {
-        const payout = singleSpin();
-
-        // Base delay: random 500–700 ms
-        let spinDelay = 500 + Math.random() * 200;
-
-        // Add extra pause for wins
-        if (payout === 12) spinDelay += 600;
-        else if (payout === 2) spinDelay += 400;
-
-        flashResult(spinDelay);
-        await new Promise(r => setTimeout(r, spinDelay));
-      }
-
-      currentRoundEl.textContent = "All Spins Completed!";
-      isRunning = false;
+      isSpinning = false;
+      spinButton.disabled = false;
     }
   </script>
 </body>
