@@ -13,7 +13,11 @@
       margin: 0;
       padding: 0;
     }
-    h1 { margin-top: 30px; font-size: 2em; letter-spacing: 1px; }
+    h1 { 
+      margin-top: 30px; 
+      font-size: 2em; 
+      letter-spacing: 1px; 
+    }
 
     button {
       background-color: #00cc66;
@@ -26,8 +30,14 @@
       margin: 10px;
       transition: 0.2s;
     }
-    button:hover:not(:disabled) { background-color: #00ff88; transform: scale(1.05); }
-    button:disabled { background-color: #00994d; cursor: not-allowed; }
+    button:hover:not(:disabled) { 
+      background-color: #00ff88; 
+      transform: scale(1.05); 
+    }
+    button:disabled { 
+      background-color: #00994d; 
+      cursor: not-allowed; 
+    }
 
     #current-round {
       font-size: 1.5em;
@@ -40,8 +50,13 @@
       font-size: 2em;
       transition: color 0.2s, transform 0.2s;
     }
-    .flash { color: #00ff88; transform: scale(1.3); }
-    .loss { color: #ff5555; }
+    .flash { 
+      color: #00ff88; 
+      transform: scale(1.3); 
+    }
+    .loss { 
+      color: #ff5555; 
+    }
 
     #counters {
       margin-top: 20px;
@@ -56,7 +71,7 @@
 <body>
   <h1>🎰 Randomized Jackpot 🎰</h1>
 
-  <button id="spin-button" onclick="singleSpin()">Spin Once</button>
+  <button id="spin-button" onclick="singleSpin()">Spin 30 Times</button>
 
   <div id="current-round">Ready to spin!</div>
   <div id="result">💰💰💰</div>
@@ -93,48 +108,55 @@
       isSpinning = true;
       spinButton.disabled = true;
 
-      totalSpins++;
-      spinCountEl.textContent = totalSpins;
-      currentRoundEl.textContent = `Spin ${totalSpins}:`;
-      resultDiv.textContent = "Spinning...";
-      resultDiv.style.color = "#ffff88";
-      resultDiv.classList.remove("loss");
-
-      // Flash animation during spin
-      flashResult(1000);
-
-      // Wait for suspense
-      await new Promise(r => setTimeout(r, 1000));
-
-      const rand = Math.random();
-      let payout = 0;
-
-      // Payouts:
-      // $6 → 2 in 21
-      // $2  → 2 in 21
-      if (rand < 2 / 21) {
-        payout = 6;
-      } else if (rand < 4 / 21) {
-        payout = 2;
-      }
-
-      if (payout > 0) {
-        resultDiv.textContent = `$${payout}!`;
-        flashResult(600);
+      for (let i = 0; i < 30; i++) { // spin 30 times
+        totalSpins++;
+        spinCountEl.textContent = totalSpins;
+        currentRoundEl.textContent = `Spin ${totalSpins}:`;
+        resultDiv.textContent = "Spinning...";
+        resultDiv.style.color = "#ffff88";
         resultDiv.classList.remove("loss");
-        totalWon += payout;
-      } else {
-        resultDiv.textContent = "Try Again!";
-        resultDiv.classList.add("loss");
-        totalLost += ticketPrice; // only deduct on loss
+
+        // ✨ Variable flash duration for more natural rhythm
+        const flashDuration = 500 + Math.random() * 800;
+        flashResult(flashDuration);
+
+        // 🌀 Variable suspense delay between 0.8–1.6 seconds
+        const suspenseDelay = 800 + Math.random() * 800;
+        await new Promise(r => setTimeout(r, suspenseDelay));
+
+        const rand = Math.random();
+        let payout = 0;
+
+        // 🎯 Payout odds
+        // $6 → 2 in 21 chance
+        // $2 → 2 in 21 chance
+        if (rand < 2 / 21) {
+          payout = 6;
+        } else if (rand < 4 / 21) {
+          payout = 2;
+        }
+
+        if (payout > 0) {
+          resultDiv.textContent = `$${payout}!`;
+          flashResult(600 + Math.random() * 400); // variable flash for win
+          resultDiv.classList.remove("loss");
+          totalWon += payout;
+        } else {
+          resultDiv.textContent = "Try Again!";
+          resultDiv.classList.add("loss");
+          totalLost += ticketPrice;
+        }
+
+        totalWonEl.textContent = totalWon.toFixed(2);
+        totalLostEl.textContent = totalLost.toFixed(2);
+
+        const netProfit = totalWon - totalLost;
+        netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
+        netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
+
+        // 🎲 Random micro delay between spins (100–400ms)
+        await new Promise(r => setTimeout(r, 100 + Math.random() * 300));
       }
-
-      totalWonEl.textContent = totalWon.toFixed(2);
-      totalLostEl.textContent = totalLost.toFixed(2);
-
-      const netProfit = totalWon - totalLost;
-      netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
-      netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
 
       isSpinning = false;
       spinButton.disabled = false;
