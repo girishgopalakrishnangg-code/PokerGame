@@ -88,18 +88,17 @@
     function singleSpin(flashDuration = 600) {
       totalSpins++;
       spinCountEl.textContent = totalSpins;
-      totalLost += ticketPrice;
 
       const rand = Math.random();
       let payout = 0;
 
-      // Payouts:
-      // $13 → 1 in 20
-      // $3  → 2 in 20
+      // Adjusted payouts:
+      // $12 → 1 in 20
+      // $2  → 2 in 20
       if (rand < 1 / 20) {
-        payout = 13;
+        payout = 12;
       } else if (rand < 3 / 20) {
-        payout = 3;
+        payout = 2;
       }
 
       currentRoundEl.textContent = `Spin ${totalSpins}:`;
@@ -107,11 +106,12 @@
       if (payout > 0) {
         resultDiv.textContent = `$${payout}!`;
         flashResult(flashDuration);
-        totalWon += payout;
         resultDiv.classList.remove("loss");
+        totalWon += payout;
       } else {
         resultDiv.textContent = "Try Again!";
         resultDiv.classList.add("loss");
+        totalLost += ticketPrice; // only deduct ticket on loss
       }
 
       totalWonEl.textContent = totalWon.toFixed(2);
@@ -121,7 +121,7 @@
       netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
       netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
 
-      return payout; // return payout value for delay adjustment
+      return payout;
     }
 
     async function runSimulation() {
@@ -135,12 +135,10 @@
         let spinDelay = 500 + Math.random() * 200;
 
         // Add extra pause for wins
-        if (payout === 13) spinDelay += 600;
-        else if (payout === 3) spinDelay += 400;
+        if (payout === 12) spinDelay += 600;
+        else if (payout === 2) spinDelay += 400;
 
-        // Sync flash timing to delay
         flashResult(spinDelay);
-
         await new Promise(r => setTimeout(r, spinDelay));
       }
 
