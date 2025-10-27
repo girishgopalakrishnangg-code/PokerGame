@@ -155,10 +155,16 @@
           totalWon += payout;
 
           await new Promise(r => setTimeout(r, 1800 + Math.random() * 600));
-
           resultDiv.classList.remove("win");
 
-          // 🛑 Stop the loop early if $50 prize hit
+          // --- Update totals BEFORE stopping ---
+          totalWonEl.textContent = totalWon.toFixed(2);
+          totalLostEl.textContent = totalLost.toFixed(2);
+          const netProfit = totalWon - totalLost;
+          netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
+          netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
+
+          // Stop early if $50 prize hit
           if (payout === 50) {
             currentRoundEl.textContent = "🎉 Jackpot hit! Stopping early!";
             break;
@@ -168,15 +174,16 @@
           resultDiv.textContent = "Try Again!";
           resultDiv.classList.add("loss");
           totalLost += ticketPrice;
+
+          // Update totals for a loss
+          totalWonEl.textContent = totalWon.toFixed(2);
+          totalLostEl.textContent = totalLost.toFixed(2);
+          const netProfit = totalWon - totalLost;
+          netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
+          netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
+
           await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
         }
-
-        totalWonEl.textContent = totalWon.toFixed(2);
-        totalLostEl.textContent = totalLost.toFixed(2);
-
-        const netProfit = totalWon - totalLost;
-        netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
-        netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
       }
 
       isSpinning = false;
