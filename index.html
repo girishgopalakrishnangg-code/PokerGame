@@ -113,7 +113,7 @@
     let totalLost = 0;
     let isSpinning = false;
 
-    function flashResult(duration = 600) {
+    function flashResult(duration = 500) {
       resultDiv.classList.add("flash");
       setTimeout(() => resultDiv.classList.remove("flash"), duration);
     }
@@ -144,10 +144,10 @@
         resultDiv.style.color = "#ffff88";
         resultDiv.classList.remove("loss", "win");
 
-        const flashDuration = 500 + Math.random() * 800;
+        const flashDuration = 400 + Math.random() * 700;
         flashResult(flashDuration);
 
-        const suspenseDelay = 900 + Math.random() * 800;
+        const suspenseDelay = 800 + Math.random() * 700;
         await new Promise(r => setTimeout(r, suspenseDelay));
 
         const rand = Math.random();
@@ -191,7 +191,7 @@
           netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
           netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
 
-          await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
+          await new Promise(r => setTimeout(r, 500 + Math.random() * 300));
         }
       }
 
