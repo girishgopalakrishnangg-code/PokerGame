@@ -42,7 +42,7 @@
       cursor: not-allowed; 
     }
 
-    #current-round {
+    #current-round, #spins-left {
       font-size: 1.5em;
       margin-top: 20px;
       color: #ffff88;
@@ -87,9 +87,10 @@
 <body>
   <h1>🎰 Randomized Jackpot 🎰</h1>
 
-  <button id="spin-button" onclick="singleSpin()">Spin 30 Times</button>
+  <button id="spin-button" onclick="singleRound()">Spin 10 Times</button>
 
   <div id="current-round">Ready to spin!</div>
+  <div id="spins-left"></div>
   <div id="result">💰💰💰</div>
 
   <div id="counters">
@@ -106,9 +107,10 @@
     const totalLostEl = document.getElementById("total-lost");
     const netProfitEl = document.getElementById("net-profit");
     const currentRoundEl = document.getElementById("current-round");
+    const spinsLeftEl = document.getElementById("spins-left");
     const spinButton = document.getElementById("spin-button");
 
-    const ticketPrice = 1;
+    const roundPrice = 10;
     let totalSpins = 0;
     let totalWon = 0;
     let totalLost = 0;
@@ -119,12 +121,19 @@
       setTimeout(() => resultDiv.classList.remove("flash"), duration);
     }
 
-    async function singleSpin() {
+    async function singleRound() {
       if (isSpinning) return;
       isSpinning = true;
       spinButton.disabled = true;
 
-      for (let i = 0; i < 30; i++) {
+      // Charge $10 upfront for the round
+      totalLost += roundPrice;
+
+      // Start with 10 spins
+      let spinsRemaining = 10;
+      spinsLeftEl.textContent = `Spins Left: ${spinsRemaining}`;
+
+      while (spinsRemaining > 0) {
         totalSpins++;
         spinCountEl.textContent = totalSpins;
         currentRoundEl.textContent = `Spin ${totalSpins}:`;
@@ -145,46 +154,49 @@
         if (rand < 1 / 100) {
           payout = 50;
         } else if (rand < 25 / 100) {
-          payout = 1;
+          payout = 0; // extra free spin, handled below
         }
 
-        if (payout > 0) {
+        if (payout === 50) {
           resultDiv.textContent = `$${payout}!`;
           resultDiv.classList.add("win");
-          flashResult(700 + Math.random() * 500);
           totalWon += payout;
+
+          // Update totals
+          totalWonEl.textContent = totalWon.toFixed(2);
+          totalLostEl.textContent = totalLost.toFixed(2);
+          netProfitEl.textContent = `$${(totalWon - totalLost).toFixed(2)}`;
+          netProfitEl.style.color = (totalWon - totalLost) >= 0 ? "#00ff88" : "#ff5555";
 
           await new Promise(r => setTimeout(r, 1800 + Math.random() * 600));
           resultDiv.classList.remove("win");
 
-          // --- Update totals BEFORE stopping ---
-          totalWonEl.textContent = totalWon.toFixed(2);
-          totalLostEl.textContent = totalLost.toFixed(2);
-          const netProfit = totalWon - totalLost;
-          netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
-          netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
+          // Stop round early on jackpot
+          currentRoundEl.textContent = "🎉 Jackpot hit! Stopping early!";
+          break;
 
-          // Stop early if $50 prize hit
-          if (payout === 50) {
-            currentRoundEl.textContent = "🎉 Jackpot hit! Stopping early!";
-            break;
-          }
+        } else if (rand < 25 / 100) {
+          // Extra free spin
+          resultDiv.textContent = "🎁 Free Spin!";
+          resultDiv.classList.add("win");
+          spinsRemaining++; // award 1 extra spin
 
         } else {
           resultDiv.textContent = "Try Again!";
           resultDiv.classList.add("loss");
-          totalLost += ticketPrice;
-
-          // Update totals for a loss
-          totalWonEl.textContent = totalWon.toFixed(2);
-          totalLostEl.textContent = totalLost.toFixed(2);
-          const netProfit = totalWon - totalLost;
-          netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
-          netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
-
-          await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
         }
+
+        spinsRemaining--; // decrement for normal spin
+        spinsLeftEl.textContent = `Spins Left: ${spinsRemaining}`;
+
+        await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
       }
+
+      // Update totals at end of round
+      totalWonEl.textContent = totalWon.toFixed(2);
+      totalLostEl.textContent = totalLost.toFixed(2);
+      netProfitEl.textContent = `$${(totalWon - totalLost).toFixed(2)}`;
+      netProfitEl.style.color = (totalWon - totalLost) >= 0 ? "#00ff88" : "#ff5555";
 
       isSpinning = false;
       spinButton.disabled = false;
