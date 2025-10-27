@@ -153,7 +153,7 @@
         // 🎯 Payout odds
         if (rand < 1 / 100) {
           payout = 50;
-        } else if (rand < 25 / 100) {
+        } else if (rand < 29 / 100) {
           payout = 0; // extra free spin, handled below
         }
 
@@ -175,7 +175,7 @@
           currentRoundEl.textContent = "🎉 Jackpot hit! Stopping early!";
           break;
 
-        } else if (rand < 25 / 100) {
+        } else if (rand < 29 / 100) {
           // Extra free spin
           resultDiv.textContent = "🎁 Free Spin!";
           resultDiv.classList.add("win");
