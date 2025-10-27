@@ -87,7 +87,7 @@
 <body>
   <h1>🎰 Randomized Jackpot 🎰</h1>
 
-  <button id="spin-button" onclick="playRound()">Play 10-Spin Round ($10)</button>
+  <button id="spin-button" onclick="playRound()">Play 4000 -Spin Round ($4000)</button>
 
   <div id="current-round">Ready to spin!</div>
   <div id="result">💰💰💰</div>
@@ -96,7 +96,7 @@
     <p>Total Spins: <span id="spin-count">0</span></p>
     <p>Total Won: $<span id="total-won">0</span></p>
     <p>Total Lost: $<span id="total-lost">0</span></p>
-    <p>Net Profit/Loss: <span id="net-profit">$0</span></p>
+    <p>Net Profit/Loss: <span id="net-profit">$4000</span></p>
   </div>
 
   <script>
@@ -123,10 +123,10 @@
       isSpinning = true;
       spinButton.disabled = true;
 
-      const spinsPerRound = 10;
-      const roundCost = 10;
+      const spinsPerRound = 4000;
+      const roundCost = 4000;
 
-      // Charge player $10 upfront
+      // Charge player $4000 upfront
       totalLost += roundCost;
       totalLostEl.textContent = totalLost.toFixed(2);
       const netProfitStart = totalWon - totalLost;
