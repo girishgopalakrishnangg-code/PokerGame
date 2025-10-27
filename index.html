@@ -87,7 +87,7 @@
 <body>
   <h1>🎰 Randomized Jackpot 🎰</h1>
 
-  <button id="spin-button" onclick="playRound()">Play 40 -Spin Round ($40)</button>
+  <button id="spin-button" onclick="playRound()">Play 40-Spin Round ($40)</button>
 
   <div id="current-round">Ready to spin!</div>
   <div id="result">💰💰💰</div>
@@ -136,7 +136,7 @@
       currentRoundEl.textContent = `Round started! ${spinsPerRound} spins remaining...`;
 
       for (let i = 0; i < spinsPerRound; i++) {
-        const spinsLeft = spinsPerRound - i;
+        const spinsLeft = spinsPerRound - (i + 1); // ✅ fixed off-by-one bug
         totalSpins++;
         spinCountEl.textContent = totalSpins;
         currentRoundEl.textContent = `Spin ${i + 1} of ${spinsPerRound} (${spinsLeft} left)`;
@@ -154,7 +154,7 @@
         let payout = 0;
 
         // 🎯 Payout odds
-        if (rand < 26 / 100 ) {
+        if (rand < 26 / 100) {
           payout = 4;
         }
 
