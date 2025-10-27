@@ -132,11 +132,9 @@
         resultDiv.style.color = "#ffff88";
         resultDiv.classList.remove("loss", "win");
 
-        // ✨ Variable flash duration
         const flashDuration = 500 + Math.random() * 800;
         flashResult(flashDuration);
 
-        // 🌀 Variable suspense delay (0.9–1.7 s)
         const suspenseDelay = 900 + Math.random() * 800;
         await new Promise(r => setTimeout(r, suspenseDelay));
 
@@ -156,16 +154,20 @@
           flashResult(700 + Math.random() * 500);
           totalWon += payout;
 
-          // 🕒 Hold win longer (1.8–2.4 s)
           await new Promise(r => setTimeout(r, 1800 + Math.random() * 600));
 
-          resultDiv.classList.remove("win"); // stop glowing before next spin
+          resultDiv.classList.remove("win");
+
+          // 🛑 Stop the loop early if $50 prize hit
+          if (payout === 50) {
+            currentRoundEl.textContent = "🎉 Jackpot hit! Stopping early!";
+            break;
+          }
+
         } else {
           resultDiv.textContent = "Try Again!";
           resultDiv.classList.add("loss");
           totalLost += ticketPrice;
-
-          // ⏳ Shorter delay after losses (0.6–1.0 s)
           await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
         }
 
