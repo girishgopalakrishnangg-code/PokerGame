@@ -154,10 +154,12 @@
         let payout = 0;
 
         // 🎯 Payout odds
-        if (rand < 22 / 100) {
-          payout = 2;
+        if (rand < 2 / 100) {
+          payout = 16;
         }
-
+        else if (rand < 24 / 100) {
+          payout = 3;
+        }
         if (payout > 0) {
           resultDiv.textContent = `$${payout}!`;
           resultDiv.classList.add("win");
