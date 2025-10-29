@@ -94,16 +94,12 @@
 
   <div id="counters">
     <p>Total Spins: <span id="spin-count">0</span></p>
-    <p>Total Won: $<span id="total-won">0</span></p>
-    <p>Total Lost: $<span id="total-lost">0</span></p>
     <p>Net Profit/Loss: <span id="net-profit">$40</span></p>
   </div>
 
   <script>
     const resultDiv = document.getElementById("result");
     const spinCountEl = document.getElementById("spin-count");
-    const totalWonEl = document.getElementById("total-won");
-    const totalLostEl = document.getElementById("total-lost");
     const netProfitEl = document.getElementById("net-profit");
     const currentRoundEl = document.getElementById("current-round");
     const spinButton = document.getElementById("spin-button");
@@ -126,9 +122,8 @@
       const spinsPerRound = 40;
       const roundCost = 40;
 
-      // Charge player $40 upfront
+      // Charge player upfront
       totalLost += roundCost;
-      totalLostEl.textContent = totalLost.toFixed(2);
       const netProfitStart = totalWon - totalLost;
       netProfitEl.textContent = `$${netProfitStart.toFixed(2)}`;
       netProfitEl.style.color = netProfitStart >= 0 ? "#00ff88" : "#ff5555";
@@ -136,7 +131,7 @@
       currentRoundEl.textContent = `Round started! ${spinsPerRound} spins remaining...`;
 
       for (let i = 0; i < spinsPerRound; i++) {
-        const spinsLeft = spinsPerRound - (i + 1); // ✅ fixed off-by-one bug
+        const spinsLeft = spinsPerRound - (i + 1);
         totalSpins++;
         spinCountEl.textContent = totalSpins;
         currentRoundEl.textContent = `(${spinsLeft} left)`;
@@ -156,10 +151,10 @@
         // 🎯 Payout odds
         if (rand < 2 / 100) {
           payout = 16;
-        }
-        else if (rand < 24 / 100) {
+        } else if (rand < 24 / 100) {
           payout = 3;
         }
+
         if (payout > 0) {
           resultDiv.textContent = `$${payout}!`;
           resultDiv.classList.add("win");
@@ -168,33 +163,16 @@
 
           await new Promise(r => setTimeout(r, 1800 + Math.random() * 600));
           resultDiv.classList.remove("win");
-
-          // Update totals
-          totalWonEl.textContent = totalWon.toFixed(2);
-          totalLostEl.textContent = totalLost.toFixed(2);
-          const netProfit = totalWon - totalLost;
-          netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
-          netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
-
-          // Stop early if $50 prize hit
-          if (payout === 50) {
-            currentRoundEl.textContent = "🎉 Jackpot hit! Round ends early!";
-            break;
-          }
-
         } else {
           resultDiv.textContent = "Try Again!";
           resultDiv.classList.add("loss");
-
-          // Update totals
-          totalWonEl.textContent = totalWon.toFixed(2);
-          totalLostEl.textContent = totalLost.toFixed(2);
-          const netProfit = totalWon - totalLost;
-          netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
-          netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
-
           await new Promise(r => setTimeout(r, 500 + Math.random() * 300));
         }
+
+        // Update net profit continuously
+        const netProfit = totalWon - totalLost;
+        netProfitEl.textContent = `$${netProfit.toFixed(2)}`;
+        netProfitEl.style.color = netProfit >= 0 ? "#00ff88" : "#ff5555";
       }
 
       currentRoundEl.textContent += " ✅ Round complete.";
