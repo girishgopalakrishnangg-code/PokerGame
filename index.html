@@ -139,7 +139,7 @@
         const spinsLeft = spinsPerRound - (i + 1); // ✅ fixed off-by-one bug
         totalSpins++;
         spinCountEl.textContent = totalSpins;
-        currentRoundEl.textContent = `Spin ${i + 1} of ${spinsPerRound} (${spinsLeft} left)`;
+        currentRoundEl.textContent = `(${spinsLeft} left)`;
         resultDiv.textContent = "Spinning...";
         resultDiv.style.color = "#ffff88";
         resultDiv.classList.remove("loss", "win");
